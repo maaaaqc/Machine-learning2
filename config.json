@@ -1,0 +1,22 @@
+{
+    "anime": 0,
+    "askreddit": 1,
+    "baseball": 2,
+    "canada": 3,
+    "conspiracy": 4,
+    "europe": 5,
+    "funny": 6,
+    "gameofthrones": 7,
+    "globaloffensive": 8,
+    "hockey": 9,
+    "leagueoflegends": 10,
+    "movies": 11,
+    "music": 12,
+    "nba": 13,
+    "nfl": 14,
+    "overwatch": 15,
+    "soccer": 16,
+    "trees": 17,
+    "worldnews": 18,
+    "wow": 19
+}

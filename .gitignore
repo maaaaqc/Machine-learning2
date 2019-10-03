@@ -1,3 +1,5 @@
 # ignore python3.7
 venv/*
 *.csv
+*.txt
+__pycache__

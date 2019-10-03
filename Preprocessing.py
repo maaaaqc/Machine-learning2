@@ -1,13 +1,15 @@
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from pathlib import Path
 import numpy as np
 import csv
 import spacy
+import json
 
 
 nlp = spacy.load("en", disable=['parser', 'ner', 'tagger'])
 FILEPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_train.csv"
+CONFIG = Path.cwd() / "config.json"
 
 
 def read_csv(path):
@@ -25,14 +27,34 @@ def read_csv(path):
     return data
 
 
-def vectorize_all():
+def process():
     train_set = read_csv(FILEPATH)
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
-    train_x = lemmatize_all(train_x)
-    vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1))
-    vectorizer.fit_transform(train_x)
-    feature_name = vectorizer.get_feature_names()
+    # train_x = lemmatize_all(train_x)
+    categorize(train_y)
+
+
+def categorize(train_y):
+    with open(CONFIG) as json_file:
+        target = json.load(json_file)
+    for i in range(len(train_y)):
+        for key in target:
+            if train_y[i] == key:
+                train_y[i] = target[key]
+                print(train_y[i])
+
+
+def count_vectorize_all(train_x):
+    vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english')
+    output = vectorizer.fit_transform(train_x)
+    return output
+
+
+def tfidf_vectorize_all(train_x):
+    vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english')
+    output = vectorizer.fit_transform(train_x)
+    return output
 
 
 def lemmatize_all(data):
@@ -42,4 +64,4 @@ def lemmatize_all(data):
 
 
 if __name__ == "__main__":
-    vectorize_all()
+    process()
