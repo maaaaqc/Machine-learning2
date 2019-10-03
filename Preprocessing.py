@@ -24,17 +24,22 @@ def read_csv(path):
     return data
 
 
-def lemmatize_all():
+def vectorize_all():
     train_set = read_csv(FILEPATH)
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
-    # for i in range(train_x.shape[0]):
-    #     train_x[i] = np.str_(" ".join([token.lemma_ for token in nlp(str(train_x[i]))]))
+    # train_x = lemmatize_all(train_x)
     vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1))
     vectorizer.fit_transform(train_x)
     feature_name = vectorizer.get_feature_names()
     print(feature_name)
 
 
+def lemmatize_all(data):
+    for i in range(data.shape[0]):
+        data[i] = np.str_(" ".join([token.lemma_ for token in nlp(str(data))]))
+    return data
+
+
 if __name__ == "__main__":
-    lemmatize_all()
+    vectorize_all()
