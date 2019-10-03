@@ -1,5 +1,7 @@
 import numpy as np
 import csv
+
+
 def readFromCSV(path):
     fn = open(path, "r")
     ret = csv.reader(fn, delimiter=',')
@@ -14,8 +16,11 @@ def readFromCSV(path):
     # delete id column
     data = data[:, 1:]
     return data
-train = readFromCSV('reddit-comment-classification-comp-551/reddit_train.csv')
-# np.savetxt("train.txt", train)
-print(train.shape)
-print(train[:, -1])
-# print("test", readFromCSV('reddit-comment-classification-comp-551/reddit_test.csv'))
+
+
+if __name__ == "__main__":
+    train = readFromCSV('reddit-comment-classification-comp-551/reddit_train.csv')
+    # np.savetxt("train.txt", train)
+    print(train.shape)
+    print(train[:, -1])
+    # print("test", readFromCSV('reddit-comment-classification-comp-551/reddit_test.csv'))
