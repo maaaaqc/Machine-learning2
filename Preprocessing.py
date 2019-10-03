@@ -42,7 +42,6 @@ def categorize(train_y):
         for key in target:
             if train_y[i] == key:
                 train_y[i] = target[key]
-                print(train_y[i])
 
 
 def count_vectorize_all(train_x):
