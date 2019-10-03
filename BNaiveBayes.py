@@ -20,7 +20,3 @@ def readFromCSV(path):
 
 if __name__ == "__main__":
     train = readFromCSV('reddit-comment-classification-comp-551/reddit_train.csv')
-    # np.savetxt("train.txt", train)
-    print(train.shape)
-    print(train[:, -1])
-    # print("test", readFromCSV('reddit-comment-classification-comp-551/reddit_test.csv'))
