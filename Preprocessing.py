@@ -31,8 +31,8 @@ def process():
     train_set = read_csv(FILEPATH)
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
-    # train_x = lemmatize_all(train_x)
-    categorize(train_y)
+    train_x = lemmatize_all(train_x)
+    train_y = categorize(train_y)
 
 
 def categorize(train_y):
@@ -42,6 +42,7 @@ def categorize(train_y):
         for key in target:
             if train_y[i] == key:
                 train_y[i] = target[key]
+    return train_y
 
 
 def count_vectorize_all(train_x):
