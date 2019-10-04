@@ -60,14 +60,14 @@ def categorize(train_y):
 
 
 def count_vectorize_all(train_x):
-    vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english')
+    vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
     output = vectorizer.fit_transform(train_x).toarray()
     np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
     return output
 
 
 def tfidf_vectorize_all(train_x):
-    vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english')
+    vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
     output = vectorizer.fit_transform(train_x).toarray()
     return output
 
