@@ -12,6 +12,10 @@ nlp = spacy.load("en", disable=['parser', 'ner', 'tagger'])
 FILEPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_train.csv"
 CONFIG = Path.cwd() / "config.json"
 
+cjk_pattern = re.compile(u'[\u3300-\u33ff\ufe30-\ufe4f\uf900-\ufaff\U0002f800-\U0002fa1f\u30a0-\u30ff\u2e80-\u2eff\u4e00-\u9fff\u3400-\u4dbf\U00020000-\U0002a6df\U0002a700-\U0002b73f\U0002b740-\U0002b81f\U0002b820-\U0002ceaf]')
+han_pattern = re.compile(u'[\u3131-\ucb4c]')
+url_pattern = re.compile('((www\.[^\s]+)|(https?://[^\s]+))')
+
 
 def read_csv(path):
     fn = open(str(path), "r")
@@ -35,7 +39,11 @@ def process():
     for i in range(train_x.shape[0]):
         train_x[i] = clean_url(train_x[i])
         train_x[i] = clean_underscore(train_x[i])
+        train_x[i] = clean_repeat(train_x[i])
+        train_x[i] = clean_cjk(train_x[i])
+        train_x[i] = clean_hangul(train_x[i])
         train_x[i] = lemmatize_all(train_x[i])
+        train_x[i] = clean_number(train_x[i])
     train_x = count_vectorize_all(train_x)
     train_y = categorize(train_y)
     return [train_x, train_y]
@@ -65,12 +73,54 @@ def tfidf_vectorize_all(train_x):
 
 
 def clean_url(data):
-    data = re.sub('((www\.[^\s]+)|(https?://[^\s]+))', 'url', data)
+    data = url_pattern.sub('url', data)
     return data
 
 
 def clean_underscore(data):
     data = np.str_(" ".join(str(data).split("_")))
+    return data
+
+
+def clean_number(data):
+    tokens = data.split(" ")
+    new_tok = []
+    for token in tokens:
+        if not token.isnumeric():
+            new_tok.append(token)
+    data = " ".join(new_tok)
+    return data
+
+
+def clean_repeat(data):
+    tokens = data.split(" ")
+    new_tok = []
+    for token in tokens:
+        token = re.sub(r'(.)\1\1+', r'\1', token)
+        new_tok.append(token)
+    data = " ".join(new_tok)
+    return data
+
+
+def clean_cjk(data):
+    tokens = data.split(" ")
+    new_tok = []
+    for token in tokens:
+        if not cjk_pattern.search(token) == None:
+            token = "japanese"
+        new_tok.append(token)
+    data = " ".join(new_tok)
+    return data
+
+
+def clean_hangul(data):
+    tokens = data.split(" ")
+    new_tok = []
+    for token in tokens:
+        if not han_pattern.search(token) == None:
+            token = "korean"
+        new_tok.append(token)
+    data = " ".join(new_tok)
     return data
 
 
