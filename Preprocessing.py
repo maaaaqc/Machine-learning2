@@ -2,9 +2,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from pathlib import Path
 import numpy as np
-import csv
 import spacy
 import json
+import csv
 
 
 nlp = spacy.load("en", disable=['parser', 'ner', 'tagger'])
@@ -32,6 +32,7 @@ def process():
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
     train_x = lemmatize_all(train_x)
+    train_x = count_vectorize_all(train_x)
     train_y = categorize(train_y)
 
 
@@ -40,20 +41,20 @@ def categorize(train_y):
         target = json.load(json_file)
     for i in range(len(train_y)):
         for key in target:
-            if train_y[i] == key:
+            if train_y[i].lower() == key:
                 train_y[i] = target[key]
     return train_y
 
 
 def count_vectorize_all(train_x):
     vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english')
-    output = vectorizer.fit_transform(train_x)
+    output = vectorizer.fit_transform(train_x).toarray()
     return output
 
 
 def tfidf_vectorize_all(train_x):
     vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english')
-    output = vectorizer.fit_transform(train_x)
+    output = vectorizer.fit_transform(train_x).toarray()
     return output
 
 
