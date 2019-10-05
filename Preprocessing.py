@@ -80,4 +80,6 @@ def lemmatize_all(data):
 
 
 if __name__ == "__main__":
-    process()
+    train_data = process()
+    print(train_data[0])
+    print(train_data[1])
