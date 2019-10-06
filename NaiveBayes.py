@@ -11,7 +11,6 @@ class NaiveBayes:
         if self.y == i:
             count += 1
 
-
     # theta j,k
     def count_occurrance(self, j, k):
         # (# of examples where xj = 1 and y = k)/(# of examples where y = k)

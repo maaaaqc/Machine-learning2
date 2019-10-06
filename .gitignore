@@ -2,6 +2,8 @@
 venv/*
 *.csv
 *.txt
+.DS_Store
+*/.DS_Store
 __pycache__
 poetry.lock
 pyproject.toml

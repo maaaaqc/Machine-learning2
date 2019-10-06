@@ -37,16 +37,21 @@ def process():
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
     for i in range(train_x.shape[0]):
-        train_x[i] = clean_url(train_x[i])
-        train_x[i] = clean_underscore(train_x[i])
-        train_x[i] = clean_repeat(train_x[i])
-        train_x[i] = clean_cjk(train_x[i])
-        train_x[i] = clean_hangul(train_x[i])
-        train_x[i] = lemmatize_all(train_x[i])
-        train_x[i] = clean_number(train_x[i])
-    train_x = count_vectorize_all(train_x)
+        train_x[i] = process_sentence(train_x[i])
+    train_x = tfidf_vectorize_all(train_x)
     train_y = categorize(train_y)
     return [train_x, train_y]
+
+
+def process_sentence(data):
+    data = clean_url(data)
+    data = clean_underscore(data)
+    data = clean_repeat(data)
+    data = clean_cjk(data)
+    data = clean_hangul(data)
+    data = lemmatize_all(data)
+    data = clean_number(data)
+    return data
 
 
 def categorize(train_y):
@@ -62,7 +67,7 @@ def categorize(train_y):
 def count_vectorize_all(train_x):
     vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
     output = vectorizer.fit_transform(train_x).toarray()
-    np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
+    # np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
     return output
 
 
