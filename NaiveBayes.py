@@ -10,7 +10,11 @@ class NaiveBayes:
         if self.y == i:
             count += 1
 
-    def count_occurrance(self):
+    # theta j,k
+    def count_occurrance(self, j, k):
+        # (# of examples where xj = 1 and y = k)/(# of examples where y = k)
+        sum1 = 1
+        sum2 = 2
         for i in range(self.x.shape[0]):
             self.occurrance_table[self.y_dic[self.y[i][0]]][-1] += 1
             for j in range(self.x.shape[1]):
