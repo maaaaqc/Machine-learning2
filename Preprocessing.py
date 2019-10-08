@@ -1,5 +1,3 @@
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
 from pathlib import Path
 import numpy as np
 import spacy
@@ -19,7 +17,7 @@ url_pattern = re.compile('((www\.[^\s]+)|(https?://[^\s]+))')
 
 
 def read_csv(path):
-    fn = open(str(path), "r")
+    fn = open(str(path), "r", encoding="utf-8")
     ret = csv.reader(fn, delimiter=',')
     data = []
     for x in ret:
@@ -33,16 +31,12 @@ def read_csv(path):
     return data
 
 
-def process():
+def process_all():
     train_set = read_csv(FILEPATH)
-    train_set = train_set[0:1000, :]
-    train_x = train_set[:, 0]
-    train_y = train_set[:, 1]
-    for i in range(train_x.shape[0]):
-        train_x[i] = process_sentence(train_x[i])
-    train_x = tfidf_vectorize_all(train_x)
-    train_y = categorize(train_y)
-    return [train_x, train_y]
+    for i in range(train_set.shape[0]):
+        train_set[i, 0] = process_sentence(train_set[i, 0])
+    train_set[:, 1] = categorize(train_set[:, 1])
+    return train_set
 
 
 def process_sentence(data):
@@ -64,19 +58,6 @@ def categorize(train_y):
             if train_y[i].lower() == key:
                 train_y[i] = target[key]
     return train_y
-
-
-def count_vectorize_all(train_x):
-    vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x)
-    # np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
-    return output
-
-
-def tfidf_vectorize_all(train_x):
-    vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x)
-    return output
 
 
 def clean_url(data):
@@ -113,7 +94,7 @@ def clean_cjk(data):
     tokens = data.split(" ")
     new_tok = []
     for token in tokens:
-        if not cjk_pattern.search(token) == None:
+        if not cjk_pattern.search(token) is None:
             token = "japanese"
         new_tok.append(token)
     data = " ".join(new_tok)
@@ -124,7 +105,7 @@ def clean_hangul(data):
     tokens = data.split(" ")
     new_tok = []
     for token in tokens:
-        if not han_pattern.search(token) == None:
+        if not han_pattern.search(token) is None:
             token = "korean"
         new_tok.append(token)
     data = " ".join(new_tok)
