@@ -6,7 +6,9 @@ import spacy
 import json
 import csv
 import re
-
+import NaiveBayes
+import BerNB
+import NBLJW
 
 nlp = spacy.load("en", disable=['parser', 'ner', 'tagger'])
 FILEPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_train.csv"
@@ -32,8 +34,9 @@ def read_csv(path):
     return data
 
 
-def process():
-    train_set = read_csv(FILEPATH)
+def process(file_path):
+    train_set = read_csv(file_path)
+    # train_set = train_set[0:10000, :]
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
     for i in range(train_x.shape[0]):
@@ -44,7 +47,8 @@ def process():
         train_x[i] = clean_hangul(train_x[i])
         train_x[i] = lemmatize_all(train_x[i])
         train_x[i] = clean_number(train_x[i])
-    train_x = count_vectorize_all(train_x)
+    # train_x = count_vectorize_all(train_x)
+    train_x = tfidf_vectorize_all(train_x)
     train_y = categorize(train_y)
     return [train_x, train_y]
 
@@ -61,14 +65,14 @@ def categorize(train_y):
 
 def count_vectorize_all(train_x):
     vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x).toarray()
-    np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
+    output = vectorizer.fit_transform(train_x)
+    # np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
     return output
 
 
 def tfidf_vectorize_all(train_x):
     vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x).toarray()
+    output = vectorizer.fit_transform(train_x)
     return output
 
 
@@ -130,6 +134,48 @@ def lemmatize_all(data):
 
 
 if __name__ == "__main__":
-    train_data = process()
-    print(train_data[0])
-    print(train_data[1])
+    train_data = process(FILEPATH)
+    # test_data = process(Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv")
+    print(type(train_data[0]))
+    print(type(train_data[1]))
+
+    train_data[1] = train_data[1].reshape(train_data[1].shape[0], 1)
+
+    train_data_x = (train_data[0])[:, :]
+    train_data_y = (train_data[1])[:, :]
+
+    naiveBayes = NaiveBayes.NaiveBayes()
+
+    # naiveBayesLJW = NBLJW.NB(train_data_x, train_data_y)
+    # y_target = naiveBayesLJW.predict(train_data_x[51:70, :])
+    # y_true = train_data_y[51:70, :]
+    # print("true", y_true)
+    # print("y_target", y_target)
+    #
+    # # naiveBayesLJW.evaluate(y_target, y_true)
+    #
+    #
+    # # print(train_data_x.shape)
+    # # # print((train_data[0])[201:300,:])
+    naiveBayes.fit(train_data_x, train_data_y)
+    y_target = naiveBayes.predict((train_data_x[51:70, :]))
+    y_true = train_data_y[51:70, :]
+    naiveBayes.predict(y_target, y_true)
+    #
+    # # print("evaluate:", .evaluate(y_true, y_target))
+    #
+    # # nbshx = BerNB.BerNB(1)
+    # # nbshx.fit((train_data[0])[0:2000, :], (train_data[1])[0:2000,:])
+    # # y_target = nbshx.predict((train_data[0])[51:70, 0:50])
+    # # y_true = (train_data[1])[51:70, :]
+    # # print(y_target)
+    # # print(y_true)
+    #
+    # # naiveBayes.fit(train_data_x[:, :], train_data_y[:, :])
+    # # y_target = naiveBayes.predict(train_data_x[51:70, :])
+    # # y_true = train_data_y[51:70, :]
+    # # naiveBayes.evaluate(y_target, y_true)
+    #
+    # # for i in range(train_data[1].shape[0]):
+    # #     print(i, naiveBayes.predict((train_data[0])[i]), (train_data[1][i]))
+
