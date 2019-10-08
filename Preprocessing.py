@@ -7,8 +7,7 @@ import json
 import csv
 import re
 import NaiveBayes
-import BerNB
-import NBLJW
+
 
 nlp = spacy.load("en", disable=['parser', 'ner', 'tagger'])
 FILEPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_train.csv"
@@ -34,14 +33,13 @@ def read_csv(path):
     return data
 
 
-def process(file_path):
-    train_set = read_csv(file_path)
-    # train_set = train_set[0:10000, :]
+def process():
+    train_set = read_csv(FILEPATH)
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
     for i in range(train_x.shape[0]):
-    train_x = tfidf_vectorize_all(train_x)
         train_x[i] = process_sentence(train_x[i])
+    train_x = tfidf_vectorize_all(train_x)
     train_y = categorize(train_y)
     return [train_x, train_y]
 
@@ -69,14 +67,14 @@ def categorize(train_y):
 
 def count_vectorize_all(train_x):
     vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x)
+    output = vectorizer.fit_transform(train_x).toarray()
     # np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
     return output
 
 
 def tfidf_vectorize_all(train_x):
     vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x)
+    output = vectorizer.fit_transform(train_x).toarray()
     return output
 
 
@@ -182,4 +180,3 @@ if __name__ == "__main__":
     #
     # # for i in range(train_data[1].shape[0]):
     # #     print(i, naiveBayes.predict((train_data[0])[i]), (train_data[1][i]))
-
