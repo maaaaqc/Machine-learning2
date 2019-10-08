@@ -19,7 +19,7 @@ url_pattern = re.compile('((www\.[^\s]+)|(https?://[^\s]+))')
 
 
 def read_csv(path):
-    fn = open(str(path), "r")
+    fn = open(str(path), "r", encoding="utf-8")
     ret = csv.reader(fn, delimiter=',')
     data = []
     for x in ret:
@@ -112,7 +112,7 @@ def clean_cjk(data):
     tokens = data.split(" ")
     new_tok = []
     for token in tokens:
-        if not cjk_pattern.search(token) == None:
+        if not cjk_pattern.search(token) is None:
             token = "japanese"
         new_tok.append(token)
     data = " ".join(new_tok)
@@ -123,7 +123,7 @@ def clean_hangul(data):
     tokens = data.split(" ")
     new_tok = []
     for token in tokens:
-        if not han_pattern.search(token) == None:
+        if not han_pattern.search(token) is None:
             token = "korean"
         new_tok.append(token)
     data = " ".join(new_tok)
