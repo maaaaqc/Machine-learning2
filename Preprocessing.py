@@ -35,6 +35,7 @@ def read_csv(path):
 
 def process():
     train_set = read_csv(FILEPATH)
+    train_set = train_set[0:1000, :]
     train_x = train_set[:, 0]
     train_y = train_set[:, 1]
     for i in range(train_x.shape[0]):
@@ -67,14 +68,14 @@ def categorize(train_y):
 
 def count_vectorize_all(train_x):
     vectorizer = CountVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x).toarray()
+    output = vectorizer.fit_transform(train_x)
     # np.savetxt("feature.txt", vectorizer.get_feature_names(), fmt="%s")
     return output
 
 
 def tfidf_vectorize_all(train_x):
     vectorizer = TfidfVectorizer(min_df=1, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(train_x).toarray()
+    output = vectorizer.fit_transform(train_x)
     return output
 
 
@@ -136,7 +137,7 @@ def lemmatize_all(data):
 
 
 if __name__ == "__main__":
-    train_data = process(FILEPATH)
+    train_data = process()
     # test_data = process(Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv")
     print(type(train_data[0]))
     print(type(train_data[1]))
@@ -159,10 +160,13 @@ if __name__ == "__main__":
     #
     # # print(train_data_x.shape)
     # # # print((train_data[0])[201:300,:])
+    print("fit start")
     naiveBayes.fit(train_data_x, train_data_y)
+    print("fit end")
     y_target = naiveBayes.predict((train_data_x[51:70, :]))
+    print(y_target)
     y_true = train_data_y[51:70, :]
-    naiveBayes.predict(y_target, y_true)
+    print(naiveBayes.evaluate(y_target, y_true))
     #
     # # print("evaluate:", .evaluate(y_true, y_target))
     #
