@@ -49,7 +49,7 @@ class NaiveBayes:
             max_probability = -1
             max_probability_index = -1
             for k in self.y_dic.keys():
-                total = 0;
+                total = 0
                 for j in range(x_test.shape[1]):
                     theta = self.theta(j, k)
                     total += x_test[i][j] * np.math.log(theta) + (1 - x_test[i][j]) * np.math.log(1 - theta)
@@ -59,14 +59,3 @@ class NaiveBayes:
                     max_probability_index = k
             y_target[i] = max_probability_index
         return y_target
-
-    def evaluate(self, y_true, y_label):
-        total = 0
-
-        y_true = y_true.reshape(y_true.shape[0], 1)
-
-        for i in range(y_true.shape[0]):
-            # print(y_true[i], "==", y_label[i])
-            if y_true[i] == y_label[i]:
-                total = total + 1
-        return total / y_true.shape[0]
