@@ -8,7 +8,8 @@ import NaiveBayes
 
 
 nlp = spacy.load("en", disable=['parser', 'ner', 'tagger'])
-FILEPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_train.csv"
+TRAINPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_train.csv"
+TESTPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv"
 CONFIG = Path.cwd() / "config.json"
 
 cjk_pattern = re.compile(u'[\u3300-\u33ff\ufe30-\ufe4f\uf900-\ufaff\U0002f800-\U0002fa1f\u30a0-\u30ff\u2e80-\u2eff\u4e00-\u9fff\u3400-\u4dbf\U00020000-\U0002a6df\U0002a700-\U0002b73f\U0002b740-\U0002b81f\U0002b820-\U0002ceaf]')
@@ -31,12 +32,19 @@ def read_csv(path):
     return data
 
 
-def process_all():
-    train_set = read_csv(FILEPATH)
+def process_train():
+    train_set = read_csv(TRAINPATH)
     for i in range(train_set.shape[0]):
         train_set[i, 0] = process_sentence(train_set[i, 0])
     train_set[:, 1] = categorize(train_set[:, 1])
     return train_set
+
+
+def process_test():
+    test_set = read_csv(TESTPATH)
+    for i in range(test_set.shape[0]):
+        test_set[i, 0] = process_sentence(test_set[i, 0])
+    return test_set
 
 
 def process_sentence(data):
