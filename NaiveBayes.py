@@ -1,53 +1,75 @@
 import numpy as np
+import Preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+import Evaluation
 
 
-class NaiveBayes:
+class NaiveBayes(object):
     def __init__(self):
-        self.y_dic = dict()
-
-    def count_occurrance(self):
-        for i in range(self.x.shape[0]):
-            self.occurrance_table[self.y_dic[self.y[i, 0]]][-1] += 1
-            for j in range(self.x.shape[1]):
-                if self.x[i, j] != 0:
-                    self.occurrance_table[self.y_dic[self.y[i][0]]][j] += 1
-
-    def theta(self, j, k):
-        return (self.occurrance_table[self.y_dic[k]][j] + 1) / (self.occurrance_table[self.y_dic[k]][-1] + 2)
+        pass
 
     def fit(self, x, y):
-        self.x = x
-        self.y = y
+        x = x.toarray()
+        numOfSamples = np.shape(x)[0]
+        numOfFeatures = np.shape(x)[1]
+        x = (x > 0).astype(np.int_)
 
-        # construct y dictionary
-        y_set = set()
-        for ele in self.y:
-            y_set.add(ele[0])
-        i = 0
-        for ele in y_set:
-            self.y_dic[ele] = i
-            i += 1
-        # print("dic:", self.y_dic)
-        # last column is for the occurance of y
-        self.occurrance_table = np.full((len(self.y_dic), self.x.shape[1] + 1), 0)
-        self.count_occurrance()
-        print(self.occurrance_table)
-
+        self.subclasses = ['9', '13', '10', '6', '11', '0', '15', '17', '8', '14', '1', '7', '18', '4', '19', '5', '3', '12', '2', '16']
+        self.weightsX = np.zeros((len(self.subclasses), numOfFeatures))
+        self.weightsY = np.zeros((len(self.subclasses), 1))
+        for i in range(numOfSamples):
+            for j in range(len(self.subclasses)):
+                if y[i] == self.subclasses[j]:
+                    self.weightsY[j] += 1
+                    self.weightsX[j] += x[i]
+                    continue
+        # Record log_probabilities in weightsX and Y
+        for i in range(len(self.subclasses)):
+            for j in range(numOfFeatures):
+                self.weightsX[i][j] = (self.weightsX[i][j] + 1) / (self.weightsY[i] + 2)
+        for i in range(len(self.subclasses)):
+            self.weightsY[i] = (self.weightsY[i] + 1) / (numOfSamples + 2)
+        return
 
     def predict(self, x_test):
-        y_target = np.full((x_test.shape[0], 1), '-1')
+        x_test = x_test.toarray()
+        x_test = (x_test > 0).astype(np.int_)
+        numOfSamples = np.shape(x_test)[0]
+        numOfFeatures = np.shape(x_test)[1]
+        resultY = []
+        for i in range(numOfSamples):
+            probs = []
+            for n in range(len(self.subclasses)):
+                logProbability = 1
+                for j in range(numOfFeatures):
+                    if x_test[i][j] == 1:
+                        logProbability = logProbability * self.weightsX[n][j]
+                    else:
+                        logProbability = logProbability * (1 - self.weightsX[n][j])
+                logProbability = logProbability * self.weightsY[n]
+                probs.append(logProbability)
+            max_log_probability = max(probs)
+            for m in range(len(self.subclasses)):
+                if probs[m] == max_log_probability:
+                    resultY.append(self.subclasses[m])
+                    break
+        return np.asarray(resultY)
 
-        for i in range(x_test.shape[0]):
-            max_probability = -1
-            max_probability_index = -1
-            for k in self.y_dic.keys():
-                total = 0
-                for j in range(x_test.shape[1]):
-                    theta = self.theta(j, k)
-                    total += x_test[i, j] * np.math.log(theta) + (1 - x_test[i, j]) * np.math.log(1 - theta)
-                total += np.math.log(self.occurrance_table[self.y_dic[k]][-1] / self.x.shape[0])
-                if np.math.exp(total) > max_probability:
-                    max_probability = np.math.exp(total)
-                    max_probability_index = k
-            y_target[i] = max_probability_index
-        return y_target
+if __name__ == "__main__":
+    print("BerNb")
+    mnb = NaiveBayes()
+    train_data = Preprocessing.process_train()
+
+    x_all = train_data[:, 0]
+    y_all = train_data[:, 1]
+    x_train, x_test, y_train, y_test = train_test_split(x_all, y_all, test_size=0.2, random_state=0)
+    vectorizer = TfidfVectorizer(min_df=3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
+    output = vectorizer.fit_transform(x_train)
+    x_train = output[:, :]
+    mnb.fit(x_train, y_train)
+    x_test = vectorizer.transform(x_test)[:, :]
+    y_pred = mnb.predict(x_test)
+    print("pre:", y_pred)
+    print("test:", y_test)
+    print(Evaluation.evaluate(y_pred, y_test))

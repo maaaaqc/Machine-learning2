@@ -34,6 +34,7 @@ def read_csv(path):
 
 def process_train():
     train_set = read_csv(TRAINPATH)
+    # train_set = train_set[0:1000, ]
     for i in range(train_set.shape[0]):
         train_set[i, 0] = process_sentence(train_set[i, 0])
     train_set[:, 1] = categorize(train_set[:, 1])
@@ -126,7 +127,7 @@ def lemmatize_all(data):
 
 
 if __name__ == "__main__":
-    train_data = process_all()
+    train_data = process_train()
     # test_data = process(Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv")
     print(type(train_data[0]))
     print(type(train_data[1]))

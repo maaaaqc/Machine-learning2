@@ -23,16 +23,27 @@ class MultiNaiveBayes:
 
 
 if __name__ == "__main__":
+    print("MultiNaive")
     mnb = MultinomialNB()
     train_data = Preprocessing.process_train()
-    np.random.shuffle(train_data)
+    test_data = Preprocessing.process_test()
+
+
+    #
+    # np.random.shuffle(train_data)
     x_all = train_data[:, 0]
     y_all = train_data[:, 1]
-    x_train, x_test, y_train, y_test = train_test_split(x_all, y_all, test_size=0.2, random_state=0)
+    # x_train, x_test, y_train, y_test = train_test_split(x_all, y_all, test_size=0.2, random_state=0)
+    # vectorizer = TfidfVectorizer(min_df=3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
+    # output = vectorizer.fit_transform(x_train)
+    # x_train = output[:, :]
+    # naiveBayes = mnb.fit(x_train, y_train)
+    # x_test = vectorizer.transform(x_test)[:, :]
+    # y_pred = mnb.predict(x_test)
+    # print(Evaluation.evaluate(y_pred, y_test))
+
     vectorizer = TfidfVectorizer(min_df=3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    output = vectorizer.fit_transform(x_train)
-    x_train = output[:, :]
-    naiveBayes = mnb.fit(x_train, y_train)
-    x_test = vectorizer.transform(x_test)[:, :]
-    y_pred = mnb.predict(x_test)
-    print(Evaluation.evaluate(y_pred, y_test))
+    x_all = vectorizer.fit_transform(x_all)
+    mnb.fit(x_all, y_all)
+    y_pred = mnb.predict(test_data)
+    print(y_pred)
