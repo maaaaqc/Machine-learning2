@@ -28,12 +28,13 @@ def read_csv(path):
     # delete header
     data = data[1:, :]
     # delete id column
+    id_num = data[:, 0]
     data = data[:, 1:]
-    return data
+    return [id_num, data]
 
 
 def process_train():
-    train_set = read_csv(TRAINPATH)
+    train_set = read_csv(TRAINPATH)[1]
     for i in range(train_set.shape[0]):
         train_set[i, 0] = process_sentence(train_set[i, 0])
     train_set[:, 1] = categorize(train_set[:, 1])
@@ -42,19 +43,21 @@ def process_train():
 
 def process_test():
     test_set = read_csv(TESTPATH)
+    ids = test_set[0]
+    test_set = test_set[1]
     for i in range(test_set.shape[0]):
         test_set[i, 0] = process_sentence(test_set[i, 0])
-    return test_set
+    return [ids, test_set]
 
 
 def process_sentence(data):
-    data = clean_url(data)
-    data = clean_underscore(data)
-    data = clean_repeat(data)
-    data = clean_cjk(data)
-    data = clean_hangul(data)
+    # data = clean_url(data)
+    # data = clean_underscore(data)
+    # data = clean_repeat(data)
+    # data = clean_cjk(data)
+    # data = clean_hangul(data)
     data = lemmatize_all(data)
-    data = clean_number(data)
+    # data = clean_number(data)
     return data
 
 
@@ -63,7 +66,7 @@ def categorize(train_y):
         target = json.load(json_file)
     for i in range(len(train_y)):
         for key in target:
-            if train_y[i].lower() == key:
+            if train_y[i].lower() == key.lower():
                 train_y[i] = target[key]
     return train_y
 

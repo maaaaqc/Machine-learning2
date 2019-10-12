@@ -1,9 +1,4 @@
-from pathlib import Path
-import numpy as np
-import Preprocessing
-import Evaluation
-
-FILEPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv"
+import MultiNaiveBayes
 
 
 def evaluate(y_true, y_label):
@@ -13,3 +8,8 @@ def evaluate(y_true, y_label):
         if y_true[i] == y_label[i]:
             total = total + 1
     return total / y_true.shape[0]
+
+
+if __name__ == "__main__":
+    s = MultiNaiveBayes.MultiNaiveBayes()
+    s.predict()
