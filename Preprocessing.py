@@ -129,7 +129,7 @@ def lemmatize_all(data):
 
 
 if __name__ == "__main__":
-    train_data = process_all()
+    train_data = process_train()
     # test_data = process(Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv")
     print(type(train_data[0]))
     print(type(train_data[1]))
