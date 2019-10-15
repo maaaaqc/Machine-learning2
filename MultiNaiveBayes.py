@@ -23,14 +23,14 @@ class MultiNaiveBayes:
         return output
 
     def predict(self):
-        mnb = MultinomialNB()
+        mnb = MultinomialNB(alpha=0.167)
         train_data = Preprocessing.process_train()
         test_set = Preprocessing.process_test()
         x_test = test_set[1]
         id_data = test_set[0]
         x_all = train_data[:, 0]
         y_all = train_data[:, 1]
-        vectorizer = TfidfVectorizer(min_df=3, max_df=0.3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
+        vectorizer = TfidfVectorizer(min_df=1, max_df=0.2, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
         output = vectorizer.fit_transform(x_all)
         x_all = output[:, :]
         mnb.fit(x_all, y_all)
@@ -52,37 +52,24 @@ class MultiNaiveBayes:
 
 if __name__ == "__main__":
     print("MultiNaive")
-    mnb = MultinomialNB()
+    mnb = MultinomialNB(alpha=0.167)
     train_data = Preprocessing.process_train()
     test_data = Preprocessing.process_test()
 
-
-    #
-    # np.random.shuffle(train_data)
+    np.random.shuffle(train_data)
     x_all = train_data[:, 0]
     y_all = train_data[:, 1]
-<<<<<<< HEAD
     x_train, x_test, y_train, y_test = train_test_split(x_all, y_all, test_size=0.2, random_state=0)
-    vectorizer = TfidfVectorizer(min_df=3, max_df=0.3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
+    vectorizer = TfidfVectorizer(min_df=1, max_df=0.2, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
     output = vectorizer.fit_transform(x_train)
     x_train = output[:, :]
     naiveBayes = mnb.fit(x_train, y_train)
     x_test = vectorizer.transform(x_test)[:, :]
     y_pred = mnb.predict(x_test)
     print(Evaluation.evaluate(y_pred, y_test))
-=======
-    # x_train, x_test, y_train, y_test = train_test_split(x_all, y_all, test_size=0.2, random_state=0)
-    # vectorizer = TfidfVectorizer(min_df=3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    # output = vectorizer.fit_transform(x_train)
-    # x_train = output[:, :]
-    # naiveBayes = mnb.fit(x_train, y_train)
-    # x_test = vectorizer.transform(x_test)[:, :]
-    # y_pred = mnb.predict(x_test)
-    # print(Evaluation.evaluate(y_pred, y_test))
 
-    vectorizer = TfidfVectorizer(min_df=3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
-    x_all = vectorizer.fit_transform(x_all)
-    mnb.fit(x_all, y_all)
-    y_pred = mnb.predict(test_data)
-    print(y_pred)
->>>>>>> a18ca0b996da8972de7a68feb80fc9f8e0710c6c
+    # vectorizer = TfidfVectorizer(min_df=3, ngram_range=(1, 1), stop_words='english', strip_accents='ascii')
+    # x_all = vectorizer.fit_transform(x_all)
+    # mnb.fit(x_all, y_all)
+    # y_pred = mnb.predict(test_data)
+    # print(y_pred)
