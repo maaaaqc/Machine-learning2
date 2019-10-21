@@ -12,6 +12,7 @@ RUN pip install spacy && \
 
 ADD *.py ./
 ADD *.json ./
+ADD *.sh ./
 ADD reddit-comment-classification-comp-551/*.csv ./reddit-comment-classification-comp-551/
 
-CMD ["python", "-v", "Preprocessing.py"]
+CMD ["python", "-v", "Evaluation.py"]

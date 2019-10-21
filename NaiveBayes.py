@@ -14,7 +14,6 @@ class NaiveBayes(object):
         numOfSamples = np.shape(x)[0]
         numOfFeatures = np.shape(x)[1]
         x = (x > 0).astype(np.int_)
-
         self.subclasses = ['9', '13', '10', '6', '11', '0', '15', '17', '8', '14', '1', '7', '18', '4', '19', '5', '3', '12', '2', '16']
         self.weightsX = np.zeros((len(self.subclasses), numOfFeatures))
         self.weightsY = np.zeros((len(self.subclasses), 1))
@@ -56,11 +55,10 @@ class NaiveBayes(object):
                     break
         return np.asarray(resultY)
 
-if __name__ == "__main__":
-    print("BerNb")
+
+def predict_and_test():
     mnb = NaiveBayes()
     train_data = Preprocessing.process_train()
-
     x_all = train_data[:, 0]
     y_all = train_data[:, 1]
     x_train, x_test, y_train, y_test = train_test_split(x_all, y_all, test_size=0.2, random_state=0)
@@ -70,6 +68,9 @@ if __name__ == "__main__":
     mnb.fit(x_train, y_train)
     x_test = vectorizer.transform(x_test)[:, :]
     y_pred = mnb.predict(x_test)
-    print("pre:", y_pred)
-    print("test:", y_test)
     print(Evaluation.evaluate(y_pred, y_test))
+    return Evaluation.evaluate(y_pred, y_test)
+
+
+if __name__ == "__main__":
+    predict_and_test()

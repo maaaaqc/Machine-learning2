@@ -4,9 +4,17 @@ import spacy
 import json
 import csv
 import re
-import NaiveBayes
+import nltk
+from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer
+from nltk.corpus import wordnet
 
-
+# nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('wordnet')
+# nltk.download('averaged_perceptron_tagger')
+# lemmatizer = WordNetLemmatizer()
+porter = PorterStemmer()
 nlp = spacy.load("en", disable=['parser', 'ner', 'tagger'])
 TRAINPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_train.csv"
 TESTPATH = Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv"
@@ -25,9 +33,7 @@ def read_csv(path):
         data.append(x)
     data = np.array(data)
     fn.close()
-    # delete header
     data = data[1:, :]
-    # delete id column
     id_num = data[:, 0]
     data = data[:, 1:]
     return [id_num, data]
@@ -52,12 +58,14 @@ def process_test():
 
 def process_sentence(data):
     # data = clean_url(data)
-    # data = clean_underscore(data)
-    # data = clean_repeat(data)
-    # data = clean_cjk(data)
-    # data = clean_hangul(data)
-    data = lemmatize_all(data)
-    # data = clean_number(data)
+    data = clean_underscore(data)
+    data = clean_repeat(data)
+    data = clean_cjk(data)
+    data = clean_hangul(data)
+    data = lemmatize_spacy(data)
+    # data = lemmatize_nltk(data)
+    # data = stem_list(data)
+    data = clean_number(data)
     return data
 
 
@@ -123,56 +131,36 @@ def clean_hangul(data):
     return data
 
 
-def lemmatize_all(data):
+def lemmatize_spacy(data):
     data = np.str_(" ".join([token.lemma_ for token in nlp(str(data))]))
     return data
 
 
-if __name__ == "__main__":
-    train_data = process_train()
-    # test_data = process(Path.cwd() / "reddit-comment-classification-comp-551" / "reddit_test.csv")
-    print(type(train_data[0]))
-    print(type(train_data[1]))
+def nltk2wn_tag(nltk_tag):
+    if nltk_tag.startswith('J'):
+        return wordnet.ADJ
+    elif nltk_tag.startswith('V'):
+        return wordnet.VERB
+    elif nltk_tag.startswith('N'):
+        return wordnet.NOUN
+    elif nltk_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return None
 
-    train_data[1] = train_data[1].reshape(train_data[1].shape[0], 1)
 
-    train_data_x = (train_data[0])[:, :]
-    train_data_y = (train_data[1])[:, :]
+def lemmatize_nltk(sentence):
+    nltk_tagged = nltk.pos_tag(nltk.word_tokenize(sentence))
+    wn_tagged = map(lambda x: (x[0], nltk2wn_tag(x[1])), nltk_tagged)
+    res_words = []
+    for word, tag in wn_tagged:
+        if tag is None:
+            res_words.append(word)
+        else:
+            res_words.append(lemmatizer.lemmatize(word, tag))
+    return " ".join(res_words)
 
-    naiveBayes = NaiveBayes.NaiveBayes()
 
-    # naiveBayesLJW = NBLJW.NB(train_data_x, train_data_y)
-    # y_target = naiveBayesLJW.predict(train_data_x[51:70, :])
-    # y_true = train_data_y[51:70, :]
-    # print("true", y_true)
-    # print("y_target", y_target)
-    #
-    # # naiveBayesLJW.evaluate(y_target, y_true)
-    #
-    #
-    # # print(train_data_x.shape)
-    # # # print((train_data[0])[201:300,:])
-    print("fit start")
-    naiveBayes.fit(train_data_x, train_data_y)
-    print("fit end")
-    y_target = naiveBayes.predict((train_data_x[51:70, :]))
-    print(y_target)
-    y_true = train_data_y[51:70, :]
-    print(naiveBayes.evaluate(y_target, y_true))
-    #
-    # # print("evaluate:", .evaluate(y_true, y_target))
-    #
-    # # nbshx = BerNB.BerNB(1)
-    # # nbshx.fit((train_data[0])[0:2000, :], (train_data[1])[0:2000,:])
-    # # y_target = nbshx.predict((train_data[0])[51:70, 0:50])
-    # # y_true = (train_data[1])[51:70, :]
-    # # print(y_target)
-    # # print(y_true)
-    #
-    # # naiveBayes.fit(train_data_x[:, :], train_data_y[:, :])
-    # # y_target = naiveBayes.predict(train_data_x[51:70, :])
-    # # y_true = train_data_y[51:70, :]
-    # # naiveBayes.evaluate(y_target, y_true)
-    #
-    # # for i in range(train_data[1].shape[0]):
-    # #     print(i, naiveBayes.predict((train_data[0])[i]), (train_data[1][i]))
+def stem_list(input_list):
+    input_list = " ".join([porter.stem(word) for word in input_list.split(" ")])
+    return input_list

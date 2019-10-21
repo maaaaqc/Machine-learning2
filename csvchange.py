@@ -6,7 +6,7 @@ TESTPATH = Path.cwd() / "prediction.csv"
 CONFIG = Path.cwd() / "config.json"
 
 
-if __name__ == "__main__":
+def write():
     fn = open(str(TESTPATH), "r", encoding="utf-8")
     ret = csv.reader(fn, delimiter=',')
     data = []
@@ -21,4 +21,3 @@ if __name__ == "__main__":
     writer = csv.writer(open("result.csv", 'w'))
     for row in data:
         writer.writerow(row)
-
